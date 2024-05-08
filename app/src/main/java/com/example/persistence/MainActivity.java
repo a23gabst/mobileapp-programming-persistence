@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String name = nameEditText.getText().toString();
                 int height = Integer.parseInt(heightEditText.getText().toString());
-                addMountain(name, height);
+                String id = idEditText.getText().toString();
+                addMountain(name, height, id);
                 textDisplay.setText("Row inserted to database.");
             }
         });
@@ -58,25 +59,15 @@ public class MainActivity extends AppCompatActivity {
                 textDisplay.setText(stringBuilder.toString());
             }
         });
-
-        readBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<String> mountainList = getMountains();
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String mountain : mountainList) {
-                    stringBuilder.append(mountain).append("\n");
-                }
-                textDisplay.setText(stringBuilder.toString());
-            }
-        });
     }
-    private void addMountain(String name, int height) {
+    private void addMountain(String name, int height, String id) {
         ContentValues values = new ContentValues();
         values.put(DatabaseTables.Mountain.COLUMN_NAME_NAME, name);
         values.put(DatabaseTables.Mountain.COLUMN_NAME_HEIGHT, height);
+        values.put(DatabaseTables.Mountain.COLUMN_NAME_ID,id);
         database.insert(DatabaseTables.Mountain.TABLE_NAME, null, values);
     }
+
 
     private List<String> getMountains() {
         Cursor cursor = database.query(DatabaseTables.Mountain.TABLE_NAME, null, null, null, null, null, null);
@@ -84,10 +75,15 @@ public class MainActivity extends AppCompatActivity {
         while (cursor.moveToNext()) {
             String mountainName = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseTables.Mountain.COLUMN_NAME_NAME));
             int mountainHeight = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseTables.Mountain.COLUMN_NAME_HEIGHT));
-            mountains.add("Name: " + mountainName + ", Height: " + mountainHeight);
+            String mountainId =cursor.getString(cursor.getColumnIndexOrThrow(DatabaseTables.Mountain.COLUMN_NAME_ID));
+            mountains.add("Name: " + mountainName + ", Size: " + mountainHeight+ ", Cost: "+mountainId);
         }
         cursor.close();
         return mountains;
+    }
+
+    private int deleteMountain() {
+        return database.delete(DatabaseTables.Mountain.TABLE_NAME,null, null);
     }
 
 }
